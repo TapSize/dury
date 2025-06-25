@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css'
 
 const MainPage = ({ user }) => {
   // Состояния
+  const [locationMode, setLocationMode] = useState(0)
   const [mapType, setMapType] = useState('dark')
   const [menuVisible, setMenuVisible] = useState(false)
 
@@ -60,6 +61,20 @@ const MainPage = ({ user }) => {
           }}
           title="Підложка карти"
         ></button>
+        <button
+          onClick={() => setLocationMode((locationMode + 1) % 3)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            width: '40px',
+            height: '40px',
+            backgroundImage: "url('https://i.ibb.co/jLkbT7D/return-icon.png')", // или свой значок
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat'
+          }}
+            title="Вернуться к моим координатам"
+          ></button>
       </div>
 
       {/* Меню выбора подложки */}
@@ -73,6 +88,7 @@ const MainPage = ({ user }) => {
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer url={getTileLayer()} attribution="&copy; CARTO" />
+        <MyLocationMarker locationMode={locationMode} />
         <MyLocationMarker />
       </MapContainer>
     </div>
