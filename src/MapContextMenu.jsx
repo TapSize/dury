@@ -1,65 +1,50 @@
-import React from 'react'
+import { useState, useEffect } from 'react';
+import { Marker, useMap } from 'react-leaflet';
+import L from 'leaflet';
 
-const MapContextMenu = ({ onSelect, isVisible }) => {
-  if (!isVisible) return null
+const MyLocationMarker = () => {
+  const [position, setPosition] = useState(null);
+  const map = useMap();
 
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: '70px',
-        left: '80px',
-        background: 'rgba(30, 30, 30, 0.95)',
-        borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '8px 0',
-        zIndex: 1100,
-        minWidth: '160px'
-      }}
-    >
-      <button
-        onClick={() => onSelect('dark')}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: '10px',
-          color: 'white',
-          cursor: 'pointer',
-          textAlign: 'left'
-        }}
-      >
-        Темна
-      </button>
-      <button
-        onClick={() => onSelect('streets')}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: '10px',
-          color: 'white',
-          cursor: 'pointer',
-          textAlign: 'left'
-        }}
-      >
-        Вулиці
-      </button>
-      <button
-        onClick={() => onSelect('satellite')}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: '10px',
-          color: 'white',
-          cursor: 'pointer',
-          textAlign: 'left'
-        }}
-      >
-        Супутник
-      </button>
-    </div>
-  )
-}
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      console.error('Геолокація не підтримується вашим браузером');
+      return;
+    }
 
-export default MapContextMenu
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const newPosition = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+        setPosition(newPosition);
+        map.setView(newPosition); // Центруем карту за маркером
+      },
+      (err) => {
+        console.error('Помилка при отриманні геолокації', err);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 5000,
+      }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, [map]);
+
+  if (!position) return null;
+
+  const customIcon = L.icon({
+    iconUrl: 'https://i.ibb.co/Q77Vy011/MyMarker.png',
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+  });
+
+  return <Marker position={position} icon={customIcon} />;
+};
+
+export default MyLocationMarker;
