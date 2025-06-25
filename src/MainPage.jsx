@@ -6,10 +6,10 @@ import 'leaflet/dist/leaflet.css'
 
 const MainPage = ({ user }) => {
   const locationIcons = [
-  'https://i.ibb.co/jLkbT7D/return-icon.png', // режим 0 — свободный
-  'https://i.ibb.co/10JRDz8/center-icon.png', // режим 1 — центрировать
-  'https://i.ibb.co/MPt2mhY/follow-icon.png', // режим 2 — слежение
-  'https://i.ibb.co/6g6n4ch/follow-rotate-icon.png' // режим 3 — слежение + поворот
+  'https://i.ibb.co/HfwB35rn/Chat-GPT-Image-18-2025-09-51-16-1.png', // режим 0 — свободный
+  'https://i.ibb.co/Ld9CHy72/Press-1.png', // режим 1 — центрировать
+  'https://i.ibb.co/KpnPd9W7/Press-2.png', // режим 2 — слежение
+  'https://i.ibb.co/jPL756cr/Press-3.png' // режим 3 — слежение + поворот
 ]
   const [mapType, setMapType] = useState('dark')
   const [menuVisible, setMenuVisible] = useState(false)
