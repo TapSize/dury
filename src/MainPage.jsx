@@ -69,7 +69,7 @@ const MainPage = ({ user }) => {
             cursor: 'pointer',
             width: '40px',
             height: '40px',
-            backgroundImage: "url('https://i.ibb.co/jLkbT7D/return-icon.png')", // или свой значок
+            backgroundImage: "url('https://i.ibb.co/HfwB35rn/Chat-GPT-Image-18-2025-09-51-16-1.png')", // или свой значок
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat'
           }}
