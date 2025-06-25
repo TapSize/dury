@@ -1,98 +1,56 @@
-import { useEffect, useState, useMemo } from 'react'
+// MyLocationMarker.jsx
+import { useEffect, useState } from 'react'
 import { Marker, useMap } from 'react-leaflet'
 import L from 'leaflet'
+import 'leaflet-rotatedmarker'
 
 const MyLocationMarker = ({ locationMode }) => {
   const map = useMap()
-  const [position, setPosition] = useState(null)
+  const [pos, setPos] = useState(null)
   const [heading, setHeading] = useState(0)
   const [deviceHeading, setDeviceHeading] = useState(0)
   const [tracking, setTracking] = useState(false)
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      console.error('Геолокація не підтримується')
-      return
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission().then(r => {
+        if (r !== 'granted') console.warn('Доступ к ориентации не предоставлен')
+      })
     }
 
-    const watchId = navigator.geolocation.watchPosition(
-      (pos) => {
+    const posId = navigator.geolocation.watchPosition(
+      pos => {
         const { latitude, longitude, heading } = pos.coords
-        const latlng = [latitude, longitude]
-        setPosition(latlng)
-
-        if (heading !== null && !isNaN(heading)) {
-          setHeading(heading)
-        }
-
-        if (tracking) {
-          map.setView(latlng)
-        }
+        const ll = [latitude, longitude]
+        setPos(ll)
+        if (heading) setHeading(heading)
+        if (tracking) map.setView(ll)
       },
-      (err) => {
-        console.error('Помилка геолокації:', err.message)
-      },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+      console.error,
+      { enableHighAccuracy: true }
     )
-
-    return () => navigator.geolocation.clearWatch(watchId)
+    return () => navigator.geolocation.clearWatch(posId)
   }, [map, tracking])
 
   useEffect(() => {
-    const handleOrientation = (event) => {
-      if (event.alpha !== null) {
-        setDeviceHeading(event.alpha)
-      }
+    const handle = e => {
+      if (e.alpha != null) setDeviceHeading(e.alpha)
     }
-
-    window.addEventListener('deviceorientation', handleOrientation, true)
-
-    return () => {
-      window.removeEventListener('deviceorientation', handleOrientation)
-    }
+    window.addEventListener('deviceorientation', handle)
+    return () => window.removeEventListener('deviceorientation', handle)
   }, [])
 
-  // 👉 Обработка смены режима
   useEffect(() => {
-    if (locationMode === 1 && position) {
-      // Центрируем карту на метке
-      map.setView(position)
-      setTracking(false)
-    }
+    if (locationMode === 1 && pos) { map.setView(pos); setTracking(false) }
+    if (locationMode === 2 && pos) setTracking(true)
+    if (locationMode === 3 && pos) { setTracking(true); map.rotate(map.getBearing ? map.getBearing() : 0) }
+    if (locationMode === 0) { setTracking(false); map.rotate(0) }
+  }, [locationMode, pos, map])
 
-    if (locationMode === 2 && position) {
-      // Включаем автоматическое слежение
-      setTracking(true)
-    }
-
-    if (locationMode === 3 && position) {
-      // Слежение + ориентация (поворот устройства)
-      setTracking(true)
-    }
-
-    if (locationMode === 0 && position) {
-      // Выключаем слежение
-      setTracking(false)
-    }
-  }, [locationMode, position, map])
-
-  const myLocationIcon = useMemo(() => {
-    return L.divIcon({
-      className: 'myMarker_Glow',
-      html: `<div style="
-        width: 30px;
-        height: 30px;
-        background: url('https://i.ibb.co/rKb5ctpv/My-Marker-1.png') no-repeat center center;
-        background-size: contain;
-        transform: rotate(${deviceHeading || heading}deg);
-        transition: transform 0.2s ease;
-      "></div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 15]
-    })
-  }, [heading, deviceHeading])
-
-  return position ? <Marker position={position} icon={myLocationIcon} /> : null
+  if (!pos) return null
+  const angle = deviceHeading || heading
+  return <Marker position={pos} rotationAngle={angle} rotationOrigin="center center" />
 }
 
 export default MyLocationMarker

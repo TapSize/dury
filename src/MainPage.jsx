@@ -1,99 +1,40 @@
 import { useState } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
+import L from 'leaflet'
+import 'leaflet-rotate'
 import MyLocationMarker from './MyLocationMarker'
 import MapContextMenu from './MapContextMenu'
 import 'leaflet/dist/leaflet.css'
 
 const MainPage = ({ user }) => {
-  const locationIcons = [
-  'https://i.ibb.co/HfwB35rn/Chat-GPT-Image-18-2025-09-51-16-1.png', // режим 0 — свободный
-  'https://i.ibb.co/Ld9CHy72/Press-1.png', // режим 1 — центрировать
-  'https://i.ibb.co/KpnPd9W7/Press-2.png', // режим 2 — слежение
-  'https://i.ibb.co/jPL756cr/Press-3.png' // режим 3 — слежение + поворот
-]
-  const [mapType, setMapType] = useState('dark')
+  const [mapStyle, setMapStyle] = useState('dark')
   const [menuVisible, setMenuVisible] = useState(false)
   const [locationMode, setLocationMode] = useState(0)
 
-  const handleMapStyleSelect = (style) => {
-    setMapType(style)
-    setMenuVisible(false)
-  }
+  // Ссылки на иконки для каждого режима
+  const icons = [
+    'https://i.ibb.co/jLkbT7D/return-icon.png',       // Режим 0 — свободный
+    'https://i.ibb.co/10JRDz8/center-icon.png',       // Режим 1 — центрировать
+    'https://i.ibb.co/MPt2mhY/follow-icon.png',       // Режим 2 — слежение
+    'https://i.ibb.co/6g6n4ch/follow-rotate-icon.png' // Режим 3 — слежение + поворот
+  ]
 
-  const getTileLayer = () => {
-    if (mapType === 'dark') return 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    if (mapType === 'streets') return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-    if (mapType === 'satellite') return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-  }
+  const tile = mapStyle === 'dark'
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : mapStyle === 'streets'
+      ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 
   return (
-    <div style={{ height: '100vh', width: '100%' }}>
-      {/* User ID в правом верхнем углу */}
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        right: '10px',
-        zIndex: 1000,
-        color: 'white',
-        fontSize: '16px'
-      }}>
-        {user.user_id}
+    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+      <div style={{ position: 'absolute', top: 10, right: 10, color: 'white', zIndex: 1000 }}>{user.user_id}</div>
+      <div style={{ position: 'absolute', bottom: 20, left: 20, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <button onClick={() => setMenuVisible(!menuVisible)} style={{ background: 'none', border: 'none', cursor: 'pointer', width: '40px', height: '40px', backgroundImage: "url('https://i.ibb.co/tTSG976d/Map-Change-removebg-preview-1.png')", backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
+        <button onClick={() => setLocationMode((locationMode + 1) % 4)} style={{ background: 'none', border: 'none', cursor: 'pointer', width: '40px', height: '40px', backgroundImage: `url(${icons[locationMode]})`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
       </div>
-
-      {/* Кнопки */}
-      <div style={{
-        position: 'absolute',
-        bottom: '20px',
-        left: '20px',
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px'
-      }}>
-        {/* Кнопка подложки */}
-        <button
-          onClick={() => setMenuVisible(!menuVisible)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            width: '40px',
-            height: '40px',
-            backgroundImage: "url('https://i.ibb.co/tTSG976d/Map-Change-removebg-preview-1.png')",
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat'
-          }}
-          title="Підложка карти"
-        ></button>
-
-        {/* Кнопка возврата */}
-        <button
-          onClick={() => setLocationMode((locationMode + 1) % 4)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            width: '40px',
-            height: '40px',
-            backgroundImage: `url(${locationIcons[locationMode]})`,
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat'
-          }}
-          title="Режим слеження"
-        ></button>
-      </div>
-
-      {/* Меню подложки */}
-      <MapContextMenu onSelect={handleMapStyleSelect} isVisible={menuVisible} />
-
-      {/* Карта */}
-      <MapContainer
-        center={[49.95, 23.2]}
-        zoom={10}
-        minZoom={4}
-        style={{ height: '100%', width: '100%' }}
-      >
-        <TileLayer url={getTileLayer()} attribution="&copy; CARTO" />
+      <MapContextMenu onSelect={style => { setMapStyle(style); setMenuVisible(false) }} isVisible={menuVisible} />
+      <MapContainer center={[49.95, 23.2]} zoom={10} style={{ width: '100%', height: '100%' }}>
+        <TileLayer url={tile} attribution="&copy; CARTO" />
         <MyLocationMarker locationMode={locationMode} />
       </MapContainer>
     </div>
