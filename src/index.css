@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+/* Чёрный фон на весь экран */
+.auth-container {
+  background-color: #1e1e1e;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Окно формы */
+.auth-box {
+  background: rgba(30, 30, 30, 0.95);
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 320px;
+}
+
+/* Заголовок */
+.auth-title {
+  color: white;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Поля */
+.auth-input {
+  background: #222;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.auth-input::placeholder {
+  color: #888;
+}
+
+/* Кнопка */
+.auth-button {
+  background: #7cadd7;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.auth-button:hover {
+  background: #689fc6;
+}
+.auth-error {
+  color: #ff6666;
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  animation: blink 1.5s infinite ease-in-out;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
