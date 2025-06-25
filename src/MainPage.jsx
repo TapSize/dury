@@ -5,6 +5,12 @@ import MapContextMenu from './MapContextMenu'
 import 'leaflet/dist/leaflet.css'
 
 const MainPage = ({ user }) => {
+  const locationIcons = [
+  'https://i.ibb.co/jLkbT7D/return-icon.png', // режим 0 — свободный
+  'https://i.ibb.co/10JRDz8/center-icon.png', // режим 1 — центрировать
+  'https://i.ibb.co/MPt2mhY/follow-icon.png', // режим 2 — слежение
+  'https://i.ibb.co/6g6n4ch/follow-rotate-icon.png' // режим 3 — слежение + поворот
+]
   const [mapType, setMapType] = useState('dark')
   const [menuVisible, setMenuVisible] = useState(false)
   const [locationMode, setLocationMode] = useState(0)
@@ -69,7 +75,7 @@ const MainPage = ({ user }) => {
             cursor: 'pointer',
             width: '40px',
             height: '40px',
-            backgroundImage: "url('https://i.ibb.co/jLkbT7D/return-icon.png')",
+            backgroundImage: `url(${locationIcons[locationMode]})`,
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat'
           }}
