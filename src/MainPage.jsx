@@ -1,22 +1,19 @@
 import { useState } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
-import MapContextMenu from './MapContextMenu'
 import MyLocationMarker from './MyLocationMarker'
+import MapContextMenu from './MapContextMenu'
 import 'leaflet/dist/leaflet.css'
 
 const MainPage = ({ user }) => {
-  // Состояния
-  const [locationMode, setLocationMode] = useState(0)
   const [mapType, setMapType] = useState('dark')
   const [menuVisible, setMenuVisible] = useState(false)
+  const [locationMode, setLocationMode] = useState(0)
 
-  // Переключение подложки
   const handleMapStyleSelect = (style) => {
     setMapType(style)
     setMenuVisible(false)
   }
 
-  // Выбор ссылки на подложку
   const getTileLayer = () => {
     if (mapType === 'dark') return 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
     if (mapType === 'streets') return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -37,7 +34,7 @@ const MainPage = ({ user }) => {
         {user.user_id}
       </div>
 
-      {/* Кнопка для открытия меню */}
+      {/* Кнопки */}
       <div style={{
         position: 'absolute',
         bottom: '20px',
@@ -47,6 +44,7 @@ const MainPage = ({ user }) => {
         flexDirection: 'column',
         gap: '10px'
       }}>
+        {/* Кнопка подложки */}
         <button
           onClick={() => setMenuVisible(!menuVisible)}
           style={{
@@ -61,23 +59,25 @@ const MainPage = ({ user }) => {
           }}
           title="Підложка карти"
         ></button>
+
+        {/* Кнопка возврата */}
         <button
-          onClick={() => setLocationMode((locationMode + 1) % 3)}
+          onClick={() => setLocationMode((locationMode + 1) % 4)}
           style={{
             background: 'none',
             border: 'none',
             cursor: 'pointer',
             width: '40px',
             height: '40px',
-            backgroundImage: "url('https://i.ibb.co/HfwB35rn/Chat-GPT-Image-18-2025-09-51-16-1.png')", // или свой значок
+            backgroundImage: "url('https://i.ibb.co/jLkbT7D/return-icon.png')",
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat'
           }}
-            title="Вернуться к моим координатам"
-          ></button>
+          title="Режим слеження"
+        ></button>
       </div>
 
-      {/* Меню выбора подложки */}
+      {/* Меню подложки */}
       <MapContextMenu onSelect={handleMapStyleSelect} isVisible={menuVisible} />
 
       {/* Карта */}
@@ -89,7 +89,6 @@ const MainPage = ({ user }) => {
       >
         <TileLayer url={getTileLayer()} attribution="&copy; CARTO" />
         <MyLocationMarker locationMode={locationMode} />
-        <MyLocationMarker />
       </MapContainer>
     </div>
   )

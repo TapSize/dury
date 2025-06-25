@@ -7,8 +7,8 @@ const MyLocationMarker = ({ locationMode }) => {
   const [position, setPosition] = useState(null)
   const [heading, setHeading] = useState(0)
   const [deviceHeading, setDeviceHeading] = useState(0)
+  const [tracking, setTracking] = useState(false)
 
-  // Отслеживаем геолокацию
   useEffect(() => {
     if (!navigator.geolocation) {
       console.error('Геолокація не підтримується')
@@ -20,10 +20,13 @@ const MyLocationMarker = ({ locationMode }) => {
         const { latitude, longitude, heading } = pos.coords
         const latlng = [latitude, longitude]
         setPosition(latlng)
-        map.setView(latlng)
 
         if (heading !== null && !isNaN(heading)) {
           setHeading(heading)
+        }
+
+        if (tracking) {
+          map.setView(latlng)
         }
       },
       (err) => {
@@ -33,9 +36,8 @@ const MyLocationMarker = ({ locationMode }) => {
     )
 
     return () => navigator.geolocation.clearWatch(watchId)
-  }, [map])
+  }, [map, tracking])
 
-  // Отслеживаем поворот телефона
   useEffect(() => {
     const handleOrientation = (event) => {
       if (event.alpha !== null) {
@@ -50,26 +52,30 @@ const MyLocationMarker = ({ locationMode }) => {
     }
   }, [])
 
-  // 👉 Вот этот useEffect для кнопки
+  // 👉 Обработка смены режима
   useEffect(() => {
     if (locationMode === 1 && position) {
+      // Центрируем карту на метке
       map.setView(position)
+      setTracking(false)
     }
 
     if (locationMode === 2 && position) {
-      map.setView(position, map.getZoom(), {
-        animate: true,
-        pan: { duration: 1 }
-      })
-      // Здесь пока не вращаем карту (Leaflet по умолчанию не поддерживает поворот)
+      // Включаем автоматическое слежение
+      setTracking(true)
+    }
+
+    if (locationMode === 3 && position) {
+      // Слежение + ориентация (поворот устройства)
+      setTracking(true)
     }
 
     if (locationMode === 0 && position) {
-      map.setView(position)
+      // Выключаем слежение
+      setTracking(false)
     }
   }, [locationMode, position, map])
 
-  // Создаём иконку
   const myLocationIcon = useMemo(() => {
     return L.divIcon({
       className: 'myMarker_Glow',
